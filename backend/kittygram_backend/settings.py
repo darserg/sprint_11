@@ -5,6 +5,21 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_env_file(path):
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip())
+
+
+load_env_file(BASE_DIR.parent / ".env")
+load_env_file(BASE_DIR / ".env")
+
+
 def get_bool_env(name, default=False):
     return os.getenv(name, str(default)).lower() in ("true", "1", "yes")
 
@@ -73,7 +88,7 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_DB", os.getenv("DB_NAME", "kittygram")),
         "USER": os.getenv("POSTGRES_USER", "kittygram_user"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "db"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
